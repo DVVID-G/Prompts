@@ -365,6 +365,85 @@ When reviewing code or suggesting changes:
 4. **Suggest fixes** that maintain layer separation
 5. **Ensure consistency** with existing patterns in the codebase
 
+## Architecture Audit Process
+
+When performing an architecture audit, follow these steps:
+
+### Step 1: Identify Scope of Audit
+- If user specifies files/modules, audit only those
+- If no scope specified, audit all backend modules in `Backend/src/modules/`
+- Check for modified files in git if reviewing changes
+
+### Step 2: Execute Comprehensive Architecture Audit
+- For each module, verify the structure follows the pattern:
+  - `controllers/` - HTTP handling only
+  - `services/` - Business logic and TypeORM access
+  - `entities/` - TypeORM models
+  - `dto/` - Validation and API contracts
+- For each layer, perform detailed audit using the checklist above:
+  - **DTO Audit:** Validation decorators, Swagger docs, naming conventions
+  - **Entity Audit:** TypeORM decorators, base entity usage, no validation
+  - **Controller Audit:** Delegation to services, DTO usage, no business logic
+  - **Service Audit:** TypeORM access via `@InjectRepository()`, business logic, entity returns
+
+### Step 3: Detect Violations
+- Identify common violations from the examples above
+- Check for business logic in controllers
+- Verify no direct repository access in controllers
+- Ensure services return entities, not DTOs
+- Validate DTOs have proper validation decorators
+- Confirm entities don't have validation decorators
+
+### Step 4: Generate Detailed Feedback
+- For each violation found, provide:
+  - **Layer:** Which layer has the issue
+  - **File:** Specific file and line numbers
+  - **Violation:** What rule is being violated
+  - **Impact:** Why this is a problem
+  - **Fix:** Specific code changes needed
+- Group findings by layer for clarity
+- Prioritize critical violations (architecture breaks) over minor issues
+
+### Step 5: Save Audit Report with Versioning
+
+**MANDATORY:** Save the audit report in `Backend/audits/architect/` directory following this process:
+
+#### Directory Structure
+1. Check if `/audits/` exists, if not create it
+2. Check if `/audits/architect/` exists, if not create it
+
+#### File Naming Logic
+Use sequential numbering format: `XXX-ARCHITECTURE-AUDIT.md`
+
+**Process:**
+1. List all files in `/audits/architect/` that match the pattern `XXX-ARCHITECTURE-AUDIT.md` (where XXX is 3 digits)
+   - Use `glob_file_search` with pattern `/audits/architect/*-ARCHITECTURE-AUDIT.md` or `list_dir` to find existing files
+2. Extract the numeric prefix from each filename using regex `^(\d{3})-ARCHITECTURE-AUDIT\.md$`
+   - Example: Extract `001` from `001-ARCHITECTURE-AUDIT.md`
+3. Find the highest number among existing files
+4. Determine next file number:
+   - If no files exist → Use `001-ARCHITECTURE-AUDIT.md`
+   - If files exist → Calculate: `(highest_number + 1)` formatted with 3 digits and leading zeros
+5. Format: Always use 3 digits with leading zeros (001, 002, ..., 010, 011, ..., 099, 100, etc.)
+
+**Examples:**
+- No files exist → Create `001-ARCHITECTURE-AUDIT.md`
+- Files: `001-ARCHITECTURE-AUDIT.md`, `002-ARCHITECTURE-AUDIT.md` → Create `003-ARCHITECTURE-AUDIT.md`
+- Files: `005-ARCHITECTURE-AUDIT.md`, `010-ARCHITECTURE-AUDIT.md` → Create `011-ARCHITECTURE-AUDIT.md`
+
+#### File Content
+Include in the report:
+- Date and timestamp of the audit
+- Scope of the audit (which modules/files were audited)
+- Complete findings with all details from Step 4
+- Recommendations (see Step 6)
+- Metrics and compliance status
+
+### Step 6: Provide Recommendations
+- Suggest refactoring when layers are mixed
+- Recommend proper structure for new modules
+- Ensure consistency across all modules
+
 ## Activation
 
 This agent is activated when:
@@ -373,6 +452,7 @@ This agent is activated when:
 - Refactoring existing code
 - User requests architectural validation
 - Code review mentions layer violations
+- Command `/csr-audit` is executed
 
 ## References
 
