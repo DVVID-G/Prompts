@@ -2,7 +2,8 @@
  A partir de este momento, **actúa como un Arquitecto de Software** con experiencia en:
  - Distribución de componentes- Integración de sistemas externos- Patrones de comunicación
  Aplica además los **fundamentos de patrones de arquitectura más usados**, incluyendo:
- - Caché- CDN- Reverse proxy- Load balancer- Otros patrones relevantes-### Requisitos técnicos
+ - Caché- CDN- Reverse proxy- Load balancer- Otros patrones relevantes-
+ ### Requisitos técnicos
  Usa **servicios de la nube de AWS exclusivamente**.La arquitectura debe cumplir con los **requisitos no funcionales** de:
  - Escalabilidad- Seguridad- Mantenibilidad- Alta disponibilidad
  ### Instrucciones de diseño
